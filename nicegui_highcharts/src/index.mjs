@@ -4,6 +4,14 @@ export const loadMore = async () => {
   await import("highcharts/highcharts-more");
 };
 
+// Modules that require other modules to be loaded first.
+// Keys are module names, values are arrays of prerequisite module names.
+const moduleDependencies = {
+  treegraph: ["treemap"],
+};
+
+const loadedModules = new Set();
+
 export const loadModule = async (moduleName) => {
   const moduleLoader = {
     "acceleration-bands": () => import("highcharts/indicators/acceleration-bands"),
@@ -132,5 +140,15 @@ export const loadModule = async (moduleName) => {
     xrange: () => import("highcharts/modules/xrange"),
     zigzag: () => import("highcharts/indicators/zigzag"),
   };
-  await moduleLoader[moduleName]();
+  // Auto-load prerequisites (e.g. treegraph needs treemap).
+  for (const dep of moduleDependencies[moduleName] ?? []) {
+    if (!loadedModules.has(dep)) {
+      await moduleLoader[dep]();
+      loadedModules.add(dep);
+    }
+  }
+  if (!loadedModules.has(moduleName)) {
+    await moduleLoader[moduleName]();
+    loadedModules.add(moduleName);
+  }
 };
