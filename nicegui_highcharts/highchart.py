@@ -10,7 +10,9 @@ from .events import (
 )
 
 
-class Highchart(ui.element, component='highchart.js', esm={'nicegui-highcharts': 'dist'}):
+class Highchart(ui.element, component='highchart.js', esm={'nicegui-highcharts': 'dist'},
+                # undo Tailwind's form control reset, so range selector inputs cover the date labels again
+                default_classes='[&_.highcharts-range-selector]:[background-color:revert]'):
 
     def __init__(self, options: dict, *,
                  type: str = 'chart', extras: list[str] = [],  # noqa: B006  # pylint: disable=redefined-builtin
