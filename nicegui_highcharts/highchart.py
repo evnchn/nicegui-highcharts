@@ -9,13 +9,9 @@ from .events import (
     ChartPointDropEventArguments,
 )
 
-# Tailwind's CSS reset makes form controls transparent, so the native inputs Highcharts puts over the
-# range selector's date labels stop covering them. Match the chart's own background instead of the
-# page's, so Highcharts' input text colour stays readable with or without dark mode.
-ui.add_css('.highcharts-range-selector { background-color: #fff; }', shared=True)
-
 
 class Highchart(ui.element, component='highchart.js', esm={'nicegui-highcharts': 'dist'}):
+    _css_added = False
 
     def __init__(self, options: dict, *,
                  type: str = 'chart', extras: list[str] = [],  # noqa: B006  # pylint: disable=redefined-builtin
@@ -50,6 +46,12 @@ class Highchart(ui.element, component='highchart.js', esm={'nicegui-highcharts':
         :param on_point_drop: callback function that is called when a point is dropped
         """
         super().__init__()
+        if not Highchart._css_added:
+            Highchart._css_added = True
+            # Tailwind's CSS reset makes form controls transparent, so the native inputs Highcharts puts over
+            # the range selector's date labels stop covering them. Match the chart's own background instead of
+            # the page's, so Highcharts' input text colour stays readable with or without dark mode.
+            ui.add_css('.highcharts-range-selector { background-color: #fff; }', shared=True)
         self._props['type'] = type
         self._props['options'] = options
         self._props['extras'] = extras
