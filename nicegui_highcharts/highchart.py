@@ -9,10 +9,13 @@ from .events import (
     ChartPointDropEventArguments,
 )
 
+# Tailwind's CSS reset makes form controls transparent, so the native inputs Highcharts puts over the
+# range selector's date labels stop covering them. Match the chart's own background instead of the
+# page's, so Highcharts' input text colour stays readable with or without dark mode.
+ui.add_css('.highcharts-range-selector { background-color: #fff; }', shared=True)
 
-class Highchart(ui.element, component='highchart.js', esm={'nicegui-highcharts': 'dist'},
-                # undo Tailwind's form control reset, so range selector inputs cover the date labels again
-                default_classes='[&_.highcharts-range-selector]:[background-color:revert]'):
+
+class Highchart(ui.element, component='highchart.js', esm={'nicegui-highcharts': 'dist'}):
 
     def __init__(self, options: dict, *,
                  type: str = 'chart', extras: list[str] = [],  # noqa: B006  # pylint: disable=redefined-builtin
