@@ -1,4 +1,3 @@
-import weakref
 from collections.abc import Callable
 
 from nicegui import events, ui
@@ -9,8 +8,6 @@ from .events import (
     ChartPointDragStartEventArguments,
     ChartPointDropEventArguments,
 )
-
-_clients_with_css: weakref.WeakSet = weakref.WeakSet()
 
 
 class Highchart(ui.element, component='highchart.js', esm={'nicegui-highcharts': 'dist'}):
@@ -48,12 +45,6 @@ class Highchart(ui.element, component='highchart.js', esm={'nicegui-highcharts':
         :param on_point_drop: callback function that is called when a point is dropped
         """
         super().__init__()
-        if self.client not in _clients_with_css:
-            _clients_with_css.add(self.client)
-            # Tailwind's CSS reset makes form controls transparent, so the native inputs Highcharts puts over
-            # the range selector's date labels stop covering them. Match the chart's own background instead of
-            # the page's, so Highcharts' input text colour stays readable with or without dark mode.
-            ui.add_head_html('<style>@layer nicegui { .highcharts-range-selector { background-color: #fff; } }</style>')
         self._props['type'] = type
         self._props['options'] = options
         self._props['extras'] = extras
